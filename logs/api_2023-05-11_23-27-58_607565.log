@@ -1,0 +1,18 @@
+2023-05-11 23:27:59.020 | INFO     | ths_trader:__init__:51 - 进入同花顺__网上股票交易系统5.0
+2023-05-11 23:27:59.022 | INFO     | ths_trader:__init__:54 - 交易应用已存在,准备开始交易
+2023-05-11 23:27:59.817 | INFO     | __main__:buy_kzz:64 - =====================================================================================
+2023-05-11 23:27:59.817 | INFO     | __main__:buy_kzz:65 - 开始买入交易，当前kzz实时行情信息:
+Pandas(Index=6, 债券代码='123188', 债券名称='水羊转债', 涨跌幅=3.83, 最新价=142.3, 最高=143.8, 最低=135.606, 今开=137.0, 涨跌额=5.25, 换手率=22.52, 量比=1.57, 动态市盈率='-', 成交量=156502, 成交额=220561013.946, 昨日收盘=137.05, 总市值=988966501, 流通市值=988966501, 行情ID='0.123188', 市场类型='深A', 更新时间='2023-05-11 15:35:00', 最新交易日='2023-05-11')
+2023-05-11 23:28:03.837 | INFO     | __main__:buy_kzz:67 - 交易完成！
+2023-05-11 23:28:03.838 | INFO     | __main__:buy_kzz:71 - 通知：在[2023-05-11 23:28:03.838976]时委托下单，以市价[142.3][3.83]涨幅买入[水羊转债][123188]股票
+2023-05-11 23:28:04.266 | INFO     | message:send_dingding_msg:44 - 发送钉钉消息成功,结果：{"errcode":0,"errmsg":"ok"}
+2023-05-11 23:28:04.266 | INFO     | __main__:buy_kzz:73 - =====================================================================================
+2023-05-11 23:28:04.268 | ERROR    | __main__:<module>:132 - Traceback (most recent call last):
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 129, in <module>
+    sell_kzz(ths_trader, kzz_top)
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 78, in sell_kzz
+    if len(sold.get_stock()) == 1:
+  File "D:\code\azuma\trade\storage.py", line 37, in get_stock
+    with open(self.file_name, "r") as file:
+FileNotFoundError: [Errno 2] No such file or directory: '../record/2023-05-11/sold.csv'
+

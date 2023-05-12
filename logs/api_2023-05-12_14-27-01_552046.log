@@ -1,0 +1,32 @@
+2023-05-12 14:27:02.335 | INFO     | ths_trader:__init__:51 - 进入同花顺__网上股票交易系统5.0
+2023-05-12 14:27:02.337 | INFO     | ths_trader:__init__:54 - 交易应用已存在,准备开始交易
+2023-05-12 14:27:03.213 | INFO     | __main__:sell_kzz:88 - ************************************************************************************
+2023-05-12 14:27:03.213 | INFO     | __main__:sell_kzz:89 - 开始卖出，当前kzz实时行情信息:
+Pandas(Index=10, 债券代码='123176', 债券名称='精测转2', 涨跌幅=0.86, 最新价=169.341, 最高=183.289, 最低=168.9, 今开=173.2, 涨跌额=1.451, 换手率=39.48, 量比=1.77, 动态市盈率='-', 成交量=503720, 成交额=887429420.92, 昨日收盘=167.89, 总市值=2160791160, 流通市值=2160791160, 行情ID='0.123176', 市场类型='深A', 更新时间='2023-05-12 14:26:57', 最新交易日='2023-05-12')
+2023-05-12 14:27:03.214 | ERROR    | __main__:<module>:128 - Traceback (most recent call last):
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 125, in <module>
+    sell_kzz(ths_trader, kzz_top)
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 90, in sell_kzz
+    ths_trader.sell_fast(symbol, 80)
+TypeError: sell_fast() takes 2 positional arguments but 3 were given
+
+2023-05-12 14:27:13.379 | INFO     | __main__:sell_kzz:88 - ************************************************************************************
+2023-05-12 14:27:13.379 | INFO     | __main__:sell_kzz:89 - 开始卖出，当前kzz实时行情信息:
+Pandas(Index=10, 债券代码='123176', 债券名称='精测转2', 涨跌幅=0.86, 最新价=169.341, 最高=183.289, 最低=168.9, 今开=173.2, 涨跌额=1.451, 换手率=39.49, 量比=1.76, 动态市盈率='-', 成交量=503917, 成交额=887762051.73, 昨日收盘=167.89, 总市值=2160791160, 流通市值=2160791160, 行情ID='0.123176', 市场类型='深A', 更新时间='2023-05-12 14:27:09', 最新交易日='2023-05-12')
+2023-05-12 14:27:13.380 | ERROR    | __main__:<module>:128 - Traceback (most recent call last):
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 125, in <module>
+    sell_kzz(ths_trader, kzz_top)
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 90, in sell_kzz
+    ths_trader.sell_fast(symbol, 80)
+TypeError: sell_fast() takes 2 positional arguments but 3 were given
+
+2023-05-12 14:27:23.569 | INFO     | __main__:sell_kzz:88 - ************************************************************************************
+2023-05-12 14:27:23.569 | INFO     | __main__:sell_kzz:89 - 开始卖出，当前kzz实时行情信息:
+Pandas(Index=10, 债券代码='123176', 债券名称='精测转2', 涨跌幅=0.83, 最新价=169.287, 最高=183.289, 最低=168.9, 今开=173.2, 涨跌额=1.397, 换手率=39.52, 量比=1.77, 动态市盈率='-', 成交量=504251, 成交额=888327317.545, 昨日收盘=167.89, 总市值=2160102120, 流通市值=2160102120, 行情ID='0.123176', 市场类型='深A', 更新时间='2023-05-12 14:27:21', 最新交易日='2023-05-12')
+2023-05-12 14:27:23.570 | ERROR    | __main__:<module>:128 - Traceback (most recent call last):
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 125, in <module>
+    sell_kzz(ths_trader, kzz_top)
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 90, in sell_kzz
+    ths_trader.sell_fast(symbol, 80)
+TypeError: sell_fast() takes 2 positional arguments but 3 were given
+

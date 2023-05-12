@@ -1,0 +1,64 @@
+2023-05-11 23:10:54.461 | INFO     | ths_trader:__init__:51 - 进入同花顺__网上股票交易系统5.0
+2023-05-11 23:10:54.463 | INFO     | ths_trader:__init__:54 - 交易应用已存在,准备开始交易
+2023-05-11 23:10:55.241 | INFO     | __main__:buy_kzz:65 - =====================================================================================
+2023-05-11 23:10:55.242 | INFO     | __main__:buy_kzz:66 - 开始买入交易，当前kzz实时行情信息:
+Pandas(Index=3, 债券代码='110068', 债券名称='龙净转债', 涨跌幅=5.16, 最新价=158.904, 最高=163.999, 最低=148.63, 今开=150.6, 涨跌额=7.793, 换手率=19.59, 量比=3.98, 动态市盈率='-', 成交量=367492, 成交额=579290704.0, 昨日收盘=151.111, 总市值='-', 流通市值=2980986761, 行情ID='1.110068', 市场类型='沪A', 更新时间='2023-05-11 16:11:49', 最新交易日='2023-05-11')
+2023-05-11 23:10:59.202 | INFO     | __main__:buy_kzz:68 - 交易完成！
+2023-05-11 23:10:59.202 | INFO     | __main__:buy_kzz:72 - 通知：在[2023-05-11 23:10:59.202382]时委托下单，以市价[158.904][5.16]涨幅买入[龙净转债][110068]股票
+2023-05-11 23:10:59.312 | INFO     | message:send_dingding_msg:46 - 发送钉钉消息失败,错误：Traceback (most recent call last):
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 700, in urlopen
+    self._prepare_proxy(conn)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 996, in _prepare_proxy
+    conn.connect()
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connection.py", line 369, in connect
+    self.sock = conn = self._connect_tls_proxy(hostname, conn)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connection.py", line 504, in _connect_tls_proxy
+    socket = ssl_wrap_socket(
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\util\ssl_.py", line 453, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\util\ssl_.py", line 495, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 500, in wrap_socket
+    return self.sslsocket_class._create(
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1040, in _create
+    self.do_handshake()
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\ssl.py", line 1309, in do_handshake
+    self._sslobj.do_handshake()
+ssl.SSLEOFError: EOF occurred in violation of protocol (_ssl.c:1131)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\adapters.py", line 486, in send
+    resp = conn.urlopen(
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    retries = retries.increment(
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\urllib3\util\retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='oapi.dingtalk.com', port=443): Max retries exceeded with url: /robot/send?access_token=1b692186495fed1ed460592f3412c5601bf1bc056d74cc9494b66c99fe04ef99&timestamp=1683817859203&sign=Rnx%2FUvFQa8zn%2BLKF7DOkNwwDfwh3boH75pP7qEN3GW8%3D (Caused by SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1131)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\code\azuma\trade\message.py", line 40, in send_dingding_msg
+    resp = requests.post(api_url,
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\ly\AppData\Local\Programs\Python\Python38\lib\site-packages\requests\adapters.py", line 517, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='oapi.dingtalk.com', port=443): Max retries exceeded with url: /robot/send?access_token=1b692186495fed1ed460592f3412c5601bf1bc056d74cc9494b66c99fe04ef99&timestamp=1683817859203&sign=Rnx%2FUvFQa8zn%2BLKF7DOkNwwDfwh3boH75pP7qEN3GW8%3D (Caused by SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1131)')))
+
+2023-05-11 23:10:59.314 | INFO     | __main__:buy_kzz:74 - =====================================================================================
+2023-05-11 23:10:59.321 | ERROR    | __main__:<module>:133 - Traceback (most recent call last):
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 130, in <module>
+    sell_kzz(ths_trader, kzz_top)
+  File "D:\code\azuma\trade\kzz_fast_v2.py", line 89, in sell_kzz
+    if not bought.get_stock().__contains__(symbol) or sold.__contains__(symbol):
+AttributeError: 'TradeManager' object has no attribute '__contains__'
+

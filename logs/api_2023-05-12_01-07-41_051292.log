@@ -1,0 +1,1 @@
+2023-05-12 01:07:41.584 | INFO     | __main__:send_dingding_msg:48 - 发送钉钉消息成功,结果：{"errcode":0,"errmsg":"ok"}
