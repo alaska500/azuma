@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 logs
+trade/__pycache__
 
 ### STS ###
 .apt_generated
