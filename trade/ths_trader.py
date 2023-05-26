@@ -30,7 +30,7 @@ def empty_edit(edit_win):
 
 
 # 定义ThsTarder类
-class ThsTarder:
+class ThsTrader:
     # 传入xiadan.exe的路径,股票账号，交易密码
     def __init__(self):
 
@@ -92,7 +92,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_value.fast_trade_debug_mode:
+        if global_variable.fast_trade_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -118,7 +118,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_value.fast_trade_debug_mode:
+        if global_variable.fast_trade_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -327,7 +327,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击确定
-        if global_value.fast_trade_debug_mode:
+        if global_variable.fast_trade_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()
@@ -369,7 +369,7 @@ class ThsTarder:
         # 点击卖出
         market_buy_yes.click_input()
         # 确定
-        if global_value.fast_trade_debug_mode:
+        if global_variable.fast_trade_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()
@@ -395,7 +395,7 @@ def calculate_buy_amount(balance, buy_price):
 
 
 def stock_trade(stock_number, stock_name, buy_price):
-    ths_trader = ThsTarder()
+    ths_trader = ThsTrader()
     ths_trader.cancel_if_auto_code()
     # 查看资金明细
     balance = ths_trader.selet_balance()
@@ -415,7 +415,7 @@ def stock_trade(stock_number, stock_name, buy_price):
 
 # 实例化ThsTarder
 if __name__ == '__main__':
-    ths_trader = ThsTarder()
+    ths_trader = ThsTrader()
     while 100:
         ths_trader.buy_fast(123130, 133.900, 80)
         time.sleep(1)

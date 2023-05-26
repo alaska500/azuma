@@ -107,24 +107,24 @@ def is_start_trade(latest_price, change, high, name, symbol, debug):
 def is_sell(symbol, sell_time, sell_price, sell_change):
     buy_df = trade_storage.get_position(symbol)
     buy_change = buy_df['买入时涨幅']
-    if sell_change < 5.55 or buy_change - sell_change > 0.8:
+    if sell_change < 2.55 or buy_change - sell_change > 0.85:
         return True
 
 if __name__ == '__main__':
-    ths_trader = ths.ThsTarder()
+    ths_trader = ths.ThsTrader()
     ths_trader.cancel_if_auto_code()
 
-while True:
-    kzz_top = get_kzz_realtime_top()
-    if kzz_top.empty:
-        time.sleep(10)
-        continue
-
-    if date_util.exist_trading_time(debug):
-        try:
-            buy_kzz(ths_trader, kzz_top[:10].copy())
-            sell_kzz(ths_trader, kzz_top)
-            time.sleep(2)
-        except Exception:
-            logger.error(traceback.format_exc())
+    while True:
+        kzz_top = get_kzz_realtime_top()
+        if kzz_top.empty:
             time.sleep(10)
+            continue
+
+        if date_util.exist_trading_time(debug):
+            try:
+                buy_kzz(ths_trader, kzz_top[:10].copy())
+                sell_kzz(ths_trader, kzz_top)
+                time.sleep(2)
+            except Exception:
+                logger.error(traceback.format_exc())
+                time.sleep(10)
