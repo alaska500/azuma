@@ -4,25 +4,24 @@ import ths_trader as ths
 import traceback
 import time
 import storage
-import global_value
+import global_variable
 import message
-from loguru import logger
 from util import date_util
+from util import log_util
 from datetime import datetime
 
 # logger
-logger.add('../logs/api_{time}.log', rotation='00:00', encoding='utf-8',
-           filter=lambda record: record["level"].name == "INFO")
+logger = log_util.get_logger()
 
 pd.set_option('display.unicode.ambiguous_as_wide', True)
 pd.set_option('display.unicode.east_asian_width', True)
 # 设置打印宽度(**重要**)
 pd.set_option('display.width', None)
 
-trade_maneger = storage.TradeManager()
+trade_storage = storage.TradeStorage()
 
 # 是否调试
-debug = global_value.fast_trade_debug
+debug = global_variable.fast_trade_debug_mode
 
 def get_kzz_realtime_top():
     try:
@@ -61,16 +60,16 @@ def buy_kzz(ths_trader, kzz_realtime_top):
         now = datetime.now()
 
         if is_start_trade(latest_price, change, high, name, symbol, debug):
-            logger.info("=====================================================================================")
-            logger.info("开始买入，当前kzz实时行情信息:\n" + row.__str__())
+            logger.info("【😊】============================================================================")
+            logger.info("【😊】开始买入，当前kzz实时行情信息:\n" + row.__str__())
             ths_trader.buy_fast(symbol)
-            logger.info("交易完成！")
-            trade_maneger.insert_bought_position(symbol, name, now, latest_price, change)
-            new = '通知：在[%s]时委托下单，以市价[%s][%s]涨幅买入[%s][%s]股票' % (
+            logger.info("【😊】交易完成！")
+            trade_storage.insert_bought_position(symbol, name, now, latest_price, change)
+            new = '【😊】通知：在[%s]时委托下单，以市价[%s][%s]涨幅买入[%s][%s]股票' % (
                 now, latest_price, change, name, symbol)
             logger.info(new)
             message.send_dingding_msg(new)
-            logger.info("=====================================================================================")
+            logger.info("【😊】============================================================================")
             break
 
 
@@ -83,30 +82,32 @@ def sell_kzz(ths_trader, kzz_top):
         change = getattr(row, '涨跌幅')
         now = datetime.now()
 
-        if symbol in trade_maneger.bought_set and symbol not in trade_maneger.sold_set:
+        if symbol in trade_storage.bought_set and symbol not in trade_storage.sold_set:
             if is_sell(symbol, now, latest_price, change):
-                logger.info("************************************************************************************")
-                logger.info("开始卖出，当前kzz实时行情信息:\n" + row.__str__())
+                logger.info("【😂】************************************************************************************")
+                logger.info("【😂】开始卖出，当前kzz实时行情信息:\n" + row.__str__())
                 ths_trader.sell_fast(symbol)
-                logger.info("交易完成！")
-                trade_maneger.insert_sold_position(symbol, now, latest_price, change)
-                new = '==========通知：在[%s]时委托下单，以市价[%s][%s]涨幅卖出[%s][%s]股票' % (
+                logger.info("【😂】交易完成！")
+                trade_storage.insert_sold_position(symbol, now, latest_price, change)
+                new = '【😂】通知：在[%s]时委托下单，以市价[%s][%s]涨幅卖出[%s][%s]股票' % (
                     now, latest_price, change, name, symbol)
                 logger.info(new)
                 message.send_dingding_msg(new)
-                logger.info("************************************************************************************")
+                logger.info("【😂】************************************************************************************")
 
 
 def is_start_trade(latest_price, change, high, name, symbol, debug):
     if debug:
-        return (3.3 < change < 5.5) and (not name.startswith("N")) and (not trade_maneger.bought_set.__contains__(symbol))
+        return (3.3 < change < 5.5) and (not name.startswith("N")) and (not trade_storage.bought_set.__contains__(symbol))
     else:
-        return (3.3 < change < 5.5) and (high / latest_price < 1.007) and (not name.startswith("N")) and (
-            not trade_maneger.bought_set.__contains__(symbol))
+        return (3.3 < change < 5.5) and (high / latest_price < 1.009) and (not name.startswith("N")) and (
+            not trade_storage.bought_set.__contains__(symbol))
 
 
 def is_sell(symbol, sell_time, sell_price, sell_change):
-    if sell_change < 2.3:
+    buy_df = trade_storage.get_position(symbol)
+    buy_change = buy_df['买入时涨幅']
+    if sell_change < 5.55 or buy_change - sell_change > 0.8:
         return True
 
 if __name__ == '__main__':
@@ -119,9 +120,9 @@ while True:
         time.sleep(10)
         continue
 
-    if date_util.in_trading_time(debug):
+    if date_util.exist_trading_time(debug):
         try:
-            # buy_kzz(ths_trader, kzz_top[:10].copy())
+            buy_kzz(ths_trader, kzz_top[:10].copy())
             sell_kzz(ths_trader, kzz_top)
             time.sleep(2)
         except Exception:

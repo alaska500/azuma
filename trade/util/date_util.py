@@ -1,15 +1,19 @@
 import time
 from datetime import datetime
-from loguru import logger
+from util import log_util
+
+logger = log_util.get_logger()
 
 
-def in_trading_time(debug):
+# 判断当前时间是否在股票交易时间内
+# 每天的9:30-11:30 13:00-15:00
+def exist_trading_time(debug):
     if debug:
         return True
 
     now = datetime.now()
 
-    morning_trading_start_time = datetime(now.year, now.month, now.day, 9, 31, 00)
+    morning_trading_start_time = datetime(now.year, now.month, now.day, 9, 30, 25)
     morning_trading_end_time = datetime(now.year, now.month, now.day, 11, 30, 00)
 
     afternoon_trading_start_time = datetime(now.year, now.month, now.day, 13, 00, 30)

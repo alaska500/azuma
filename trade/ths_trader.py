@@ -2,26 +2,20 @@
 # 导入库
 import io
 import time
-import traceback
 import pandas as pd
 import pytesseract
 import message
-import global_value
-from loguru import logger
-from datetime import datetime
+import global_variable
 from pywinauto.keyboard import send_keys
 from pywinauto import Application, clipboard
-from pywinauto.timings import Timings
+from util import log_util
+from datetime import datetime
 
-Timings.fast()
 # logger
-logger.add('../logs/api_{time}.log', rotation='00:00', encoding='utf-8')
+logger = log_util.get_logger()
 # 下单程序的路径
 xiadan_exe_path = r'D:\同花顺软件\同花顺\xiadan.exe'
 tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-# 交易账户和密码
-stock_account = "210300139055"
-trader_password = "978856"
 
 
 # 验证码识别，参数：图片，返回字符串
@@ -98,7 +92,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_value.fast_trade_debug:
+        if global_value.fast_trade_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -124,7 +118,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_value.fast_trade_debug:
+        if global_value.fast_trade_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -333,7 +327,7 @@ class ThsTarder:
         # 确定买入
         market_buy_yes.click_input()
         # 点击确定
-        if global_value.fast_trade_debug:
+        if global_value.fast_trade_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()
@@ -375,7 +369,7 @@ class ThsTarder:
         # 点击卖出
         market_buy_yes.click_input()
         # 确定
-        if global_value.fast_trade_debug:
+        if global_value.fast_trade_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()

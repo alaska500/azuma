@@ -7,12 +7,9 @@ import hashlib
 import base64
 import urllib.parse
 import traceback
-from loguru import logger
+from util import log_util
 
-
-#logger
-logger.add('../logs/api_{time}.log', rotation='00:00', encoding='utf-8')
-
+logger = log_util.get_logger()
 dd_token = '1b692186495fed1ed460592f3412c5601bf1bc056d74cc9494b66c99fe04ef99'
 secret_key = "SEC46e3c984343932b103a0b9ef0f5f3fc0e6315eb81e90f9a44bfa2daf4784cbd9"
 
