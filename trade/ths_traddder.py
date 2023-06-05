@@ -300,6 +300,7 @@ class ThsTrader:
     def market_buy_fast(self, market_buy_stock_number, market_buy_amount):
         # 复制临时主窗口控件，便于操作
         temporary_main_win = self.main_window
+        # logger.info(self.main_window.print_control_identifiers())
         temporary_main_win.set_focus()
         # 定位左侧市价委托控件
         left_sell_ctrl = temporary_main_win.child_window(title="市价委托", control_type="TreeItem")

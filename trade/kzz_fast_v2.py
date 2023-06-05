@@ -9,6 +9,9 @@ import message
 from util import date_util
 from util import log_util
 from datetime import datetime
+import os
+
+os.environ['NO_PROXY'] = '*'
 
 # logger
 logger = log_util.get_logger()
@@ -22,6 +25,8 @@ trade_storage = storage.TradeStorage()
 
 # 是否调试
 debug = global_variable.fast_trade_debug_mode
+
+date = datetime.now().strftime("%Y%m%d")
 
 def get_kzz_realtime_top():
     try:
@@ -44,6 +49,28 @@ def get_kzz_realtime_top():
     return pd.DataFrame()
 
 
+def confirm_buy(symbol):
+    time.sleep(5)
+    df = ef.bond.get_quote_history(str(symbol), beg=date)[-1:]
+    name = df.loc[0, '债券名称']
+    latest_price = df.loc[0, '收盘']
+    high = df.loc[0, '最高']
+    change = df.loc[0, '涨跌幅']
+    confirm = is_start_trade(latest_price, change, high, name, symbol, debug)
+    logger.info(f"【😀】当前kzz {name} 涨跌幅[{change}] 确认是否继续买入：{confirm}")
+    return confirm
+
+
+def confirm_sell(symbol):
+    time.sleep(5)
+    df = ef.bond.get_quote_history(str(symbol), beg=date)[-1:]
+    name = df.loc[0, '债券名称']
+    latest_price = df.loc[0, '收盘']
+    change = df.loc[0, '涨跌幅']
+    confirm = is_sell(symbol, datetime.now(), latest_price, change)
+    logger.info(f"【😂】当前kzz {name} 涨跌幅[{change}] 确认是否继续卖出：{confirm}")
+    return confirm
+
 #    债券代码 债券名称  涨跌幅   最新价    最高    最低    今开     涨跌额    换手率  量比 动态市盈率 成交量     成交额      昨日收盘    总市值     流通市值      行情ID   市场类型      更新时间         最新交易日
 # 0  113669  N景23转  20.25  120.245  123.8  120.01  122.71  20.245  27.14    -     -    313216  380234522.0  100.000      -      1387627300  1.113669   沪A  2023-05-09 16:11:31  2023-05-09
 # 1  123193  海能转债  16.32  116.324  118.5  115.46  118.0   16.324  60.69    -     -    364142  423652515.31 100.000  697944000  697944000   0.123193   深A  2023-05-09 15:34:18  2023-05-09
@@ -61,14 +88,16 @@ def buy_kzz(ths_trader, kzz_realtime_top):
 
         if is_start_trade(latest_price, change, high, name, symbol, debug):
             logger.info("【😊】============================================================================")
-            logger.info("【😊】开始买入，当前kzz实时行情信息:\n" + row.__str__())
+            logger.info("【😊】开始买入，当前kzz实时行情信息:\n【😊】" + row.__str__())
+            if not confirm_buy(symbol):
+                break
             ths_trader.buy_fast(symbol)
             logger.info("【😊】交易完成！")
             trade_storage.insert_bought_position(symbol, name, now, latest_price, change)
             new = '【😊】通知：在[%s]时委托下单，以市价[%s][%s]涨幅买入[%s][%s]股票' % (
                 now, latest_price, change, name, symbol)
             logger.info(new)
-            message.send_dingding_msg(new)
+            message.send(new)
             logger.info("【😊】============================================================================")
             break
 
@@ -85,14 +114,16 @@ def sell_kzz(ths_trader, kzz_top):
         if symbol in trade_storage.bought_set and symbol not in trade_storage.sold_set:
             if is_sell(symbol, now, latest_price, change):
                 logger.info("【😂】************************************************************************************")
-                logger.info("【😂】开始卖出，当前kzz实时行情信息:\n" + row.__str__())
+                logger.info("【😂】开始卖出，当前kzz实时行情信息:\n【😂】" + row.__str__())
+                if not confirm_sell(symbol):
+                    break
                 ths_trader.sell_fast(symbol)
                 logger.info("【😂】交易完成！")
                 trade_storage.insert_sold_position(symbol, now, latest_price, change)
                 new = '【😂】通知：在[%s]时委托下单，以市价[%s][%s]涨幅卖出[%s][%s]股票' % (
                     now, latest_price, change, name, symbol)
                 logger.info(new)
-                message.send_dingding_msg(new)
+                message.send(new)
                 logger.info("【😂】************************************************************************************")
 
 
@@ -107,8 +138,9 @@ def is_start_trade(latest_price, change, high, name, symbol, debug):
 def is_sell(symbol, sell_time, sell_price, sell_change):
     buy_df = trade_storage.get_position(symbol)
     buy_change = buy_df['买入时涨幅']
-    if sell_change < 2.55 or buy_change - sell_change > 0.85:
+    if sell_change < 2.70 or buy_change - sell_change > 0.75:
         return True
+
 
 if __name__ == '__main__':
     ths_trader = ths.ThsTrader()
@@ -122,9 +154,9 @@ if __name__ == '__main__':
 
         if date_util.exist_trading_time(debug):
             try:
-                buy_kzz(ths_trader, kzz_top[:10].copy())
+                buy_kzz(ths_trader, kzz_top[:6].copy())
                 sell_kzz(ths_trader, kzz_top)
-                time.sleep(2)
+                time.sleep(1)
             except Exception:
                 logger.error(traceback.format_exc())
                 time.sleep(10)
