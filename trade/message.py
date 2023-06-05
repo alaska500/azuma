@@ -1,3 +1,4 @@
+import datetime
 import threading
 import requests
 import json
@@ -81,5 +82,17 @@ def send(text):
 
 
 if __name__ == '__main__':
-    send("test")
-    send("test")
+    now = datetime.datetime.now()
+    name = "光力转债"
+    symbol = "123197"
+    latest_price = "157.147"
+    change = "3.45"
+    buy_change = "4.35"
+    type = "sell"
+
+    if 'buy'.__eq__(type):
+        msg = "操作:【😊】买入 \n时间:%s \n名称:%s \n代码:%s \n价格:%s \n买入涨幅:%s" % (now,  name, symbol, latest_price, change)
+    else:
+        msg = "操作:【😂】卖出 \n时间:%s \n名称:%s \n代码:%s \n价格:%s \n买入涨幅:%s \n卖出涨幅:%s" % (now,  name, symbol, latest_price, buy_change, change)
+
+    send(msg)

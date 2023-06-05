@@ -49,6 +49,16 @@ def get_kzz_realtime_top():
     return pd.DataFrame()
 
 
+def send_dingding_msg(type, now, latest_price, change, name, symbol):
+
+    if 'buy'.__eq__(type):
+        msg = "操作:【😊】买入 \n时间:%s \n代码:%s \n名称:%s \n价格:%s \n买入涨幅:%s" % (now, symbol, name, latest_price, change)
+    else:
+        msg = "操作:【😂】卖出 \n时间:%s \n代码:%s \n名称:%s \n价格:%s \n卖出涨幅:%s" % (now, symbol, name, latest_price, change)
+
+    message.send(msg)
+
+
 def confirm_buy(symbol):
     time.sleep(5)
     df = ef.bond.get_quote_history(str(symbol), beg=date)[-1:]
@@ -84,7 +94,7 @@ def buy_kzz(ths_trader, kzz_realtime_top):
         high = float(getattr(row, '最高'))
         latest_price = float(getattr(row, '最新价'))
         change = getattr(row, '涨跌幅')
-        now = datetime.now()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if is_start_trade(latest_price, change, high, name, symbol, debug):
             logger.info("【😊】============================================================================")
@@ -97,7 +107,7 @@ def buy_kzz(ths_trader, kzz_realtime_top):
             new = '【😊】通知：在[%s]时委托下单，以市价[%s][%s]涨幅买入[%s][%s]股票' % (
                 now, latest_price, change, name, symbol)
             logger.info(new)
-            message.send(new)
+            send_dingding_msg("buy", now, latest_price, change, name, symbol)
             logger.info("【😊】============================================================================")
             break
 
@@ -109,7 +119,7 @@ def sell_kzz(ths_trader, kzz_top):
         name = getattr(row, '债券名称')
         latest_price = float(getattr(row, '最新价'))
         change = getattr(row, '涨跌幅')
-        now = datetime.now()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if symbol in trade_storage.bought_set and symbol not in trade_storage.sold_set:
             if is_sell(symbol, now, latest_price, change):
@@ -123,7 +133,7 @@ def sell_kzz(ths_trader, kzz_top):
                 new = '【😂】通知：在[%s]时委托下单，以市价[%s][%s]涨幅卖出[%s][%s]股票' % (
                     now, latest_price, change, name, symbol)
                 logger.info(new)
-                message.send(new)
+                send_dingding_msg("sell", now, latest_price, change, name, symbol)
                 logger.info("【😂】************************************************************************************")
 
 
