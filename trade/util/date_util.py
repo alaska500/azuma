@@ -8,8 +8,8 @@ logger = log_util.get_logger()
 # 判断当前时间是否在股票交易时间内
 # 每天的9:30-11:30 13:00-15:00
 def exist_trading_time(debug):
-    # if debug:
-    #     return True
+    if debug:
+        return True
 
     now = datetime.now()
 

@@ -4,4 +4,4 @@ import pandas
 pd = pandas.DataFrame()
 
 # 开启debug模式
-fast_trade_debug_mode = False
+fast_trade_debug_mode = True
