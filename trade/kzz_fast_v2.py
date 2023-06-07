@@ -67,7 +67,7 @@ def confirm_buy(symbol):
     high = df.loc[0, '最高']
     change = df.loc[0, '涨跌幅']
     confirm = is_start_trade(latest_price, change, high, name, symbol, debug)
-    logger.info(f"【😀】当前kzz {name} 涨跌幅[{change}] 确认是否继续买入：{confirm}")
+    logger.info(f"【😊】当前kzz {name} 涨跌幅[{change}] 确认是否继续买入：{confirm}")
     return confirm
 
 
@@ -97,7 +97,7 @@ def buy_kzz(ths_trader, kzz_realtime_top):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         if is_start_trade(latest_price, change, high, name, symbol, debug):
-            logger.info("【😊】============================================================================")
+            logger.info("【start】============================================================================")
             logger.info("【😊】开始买入，当前kzz实时行情信息:\n【😊】" + row.__str__())
             if not confirm_buy(symbol):
                 break
@@ -123,7 +123,7 @@ def sell_kzz(ths_trader, kzz_top):
 
         if symbol in trade_storage.bought_set and symbol not in trade_storage.sold_set:
             if is_sell(symbol, now, latest_price, change):
-                logger.info("【😂】************************************************************************************")
+                logger.info("【start】************************************************************************************")
                 logger.info("【😂】开始卖出，当前kzz实时行情信息:\n【😂】" + row.__str__())
                 if not confirm_sell(symbol):
                     break
@@ -139,16 +139,16 @@ def sell_kzz(ths_trader, kzz_top):
 
 def is_start_trade(latest_price, change, high, name, symbol, debug):
     if debug:
-        return (3.3 < change < 5.5) and (not name.startswith("N")) and (not trade_storage.bought_set.__contains__(symbol))
+        return (3.4 < change < 6) and (not name.startswith("N")) and (not trade_storage.bought_set.__contains__(symbol))
     else:
-        return (3.3 < change < 5.5) and (high / latest_price < 1.009) and (not name.startswith("N")) and (
+        return (3.4 < change < 6) and (high / latest_price < 1.009) and (not name.startswith("N")) and (
             not trade_storage.bought_set.__contains__(symbol))
 
 
 def is_sell(symbol, sell_time, sell_price, sell_change):
     buy_df = trade_storage.get_position(symbol)
     buy_change = buy_df['买入时涨幅']
-    if sell_change < 2.70 or buy_change - sell_change > 0.75:
+    if sell_change < 2.80 or buy_change - sell_change > 0.75:
         return True
 
 
