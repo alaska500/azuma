@@ -1,68 +1,97 @@
-from datetime import datetime
-import pandas as pd
 import os
+import sqlite3
+from datetime import datetime
 
 now = datetime.now()
-date_str = now.strftime("%Y-%m-%d")
-target_dir = f'../storage/{date_str}'
-
+month_str = now.strftime("%Y-%m")
+date_str = now.strftime("%Y_%m_%d")
+today = now.strftime("%Y-%m-%d")
+target_dir = f'../storage'
 if not os.path.exists(target_dir):
     os.makedirs(target_dir)
 
-bought_file_name = target_dir + "/bought.csv"
-sold_file_name = target_dir + "/sold.csv"
-position_file_name = target_dir + "/position.csv"
+tabel_name = f"trade_{date_str}"
+
+create_tabel_sql = f'''create table if not exists {tabel_name}
+(
+    id          INTEGER       primary key autoincrement,
+    date        varchar(20)   not null,
+    symbol      varchar(20)   not null,
+    name        varchar(20)   not null,
+    status      TINYINT       default '1',
+    income      decimal(8, 4) default NULL,
+    buy_time    datetime      not null,
+    buy_price   decimal(8, 4) not null,
+    buy_change  decimal(8, 4) not null,
+    sell_time   datetime      default NULL,
+    sell_price  decimal(8, 4) default NULL,
+    sell_change decimal(8, 4) default NULL
+);
+'''
 
 
-class TradeStorage:
-    def __init__(self):
-        self.bought_set = self.init_stock_info_from_file(bought_file_name)
-        self.sold_set = self.init_stock_info_from_file(sold_file_name)
-        self.position = self.init_position_info_from_file()
+def dict_factory(cursor, row):
+    # 将游标获取的数据处理成字典返回
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
-    # 当天已经交易过的股票
-    def save_bought_stock(self, symbol):
-        self.bought_set.add(symbol)
-        with open(bought_file_name, 'a', encoding='utf-8') as file:
-            file.write(symbol + "\n")
 
-    def save_sold_stock(self, symbol):
-        self.sold_set.add(symbol)
-        with open(sold_file_name, 'a', encoding='utf-8') as file:
-            file.write(symbol + "\n")
+connect = sqlite3.connect(f"{target_dir}/trade_{month_str}.db",
+                          detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+connect.row_factory = dict_factory
 
-    def init_stock_info_from_file(self, file_name):
-        if not os.path.exists(file_name):
-            return set()
+cursor = connect.cursor()
+cursor.execute(create_tabel_sql)
+connect.commit()
 
-        with open(file_name, "r") as file:
-            return set(file.read().splitlines())
 
-    def init_position_info_from_file(self):
-        if not os.path.exists(position_file_name) or os.path.getsize(position_file_name) == 0:
-            return pd.DataFrame(columns=['债券名称', '买入时间', '买入价格', '买入时涨幅', '卖出时间', '卖出价格', '卖出时涨幅', '收益'])
+def insert_buy_info(symbol, name, buy_time, buy_price, buy_change):
+    cursor.execute(f"insert into {tabel_name} (date,symbol,name,buy_price,buy_change,buy_time) values(?,?,?,?,?,?)",
+                   (today, symbol, name, buy_price, buy_change, buy_time))
+    connect.commit()
 
-        return pd.read_csv(position_file_name, index_col=0, engine='python')
 
-    def insert_bought_position(self, symbol, name, buy_time, buy_price, buy_change):
-        self.save_bought_stock(symbol)
+def insert_sell_info(symbol, income, sell_price, sell_change, sell_time):
+    cursor.execute(
+        f"update {tabel_name} set status = 2, income={income}, sell_price={sell_price}, sell_change={sell_change}, sell_time=? where id = (select id from {tabel_name} where symbol  = {symbol} and status = 1 order by id desc limit 1)",
+        [sell_time])
+    connect.commit()
 
-        self.position.loc[int(symbol)] = {'债券名称':name, '买入时间':buy_time, '买入价格':buy_price, '买入时涨幅':buy_change}
-        self.position.to_csv(position_file_name)
 
-    def insert_sold_position(self, symbol, sold_time, sold_price, sold_change):
-        self.save_sold_stock(symbol)
+def select_position_list():
+    result = cursor.execute(f"select * from {tabel_name} where status =  1")
+    return result.fetchall()
 
-        symbol_int = int(symbol)
-        self.position.loc[symbol_int, '卖出时间'] = sold_time
-        self.position.loc[symbol_int, '卖出价格'] = sold_price
-        self.position.loc[symbol_int, '卖出时涨幅'] = sold_change
 
-        self.position.to_csv(position_file_name)
+def is_bought(symbol):
+    result = cursor.execute(f"select * from {tabel_name} where symbol=? and date = ? and status = 1", (symbol, today))
+    return False if result.fetchone() is None else True
 
-    def get_position(self, symbol):
-        return self.position.loc[int(symbol)]
+
+def select_buy_times(symbol):
+    result = cursor.execute(f"select count(*) as ct from {tabel_name} where symbol=? and date = ?", (symbol, today))
+    return result.fetchone()["ct"]
+
+
+def is_sold(symbol):
+    result = cursor.execute(f"select * from {tabel_name} where symbol=? and date = ? and status = 2", (symbol, today))
+    return False if result.fetchone() is None else True
+
+
+# 关闭
+def close(self):
+    # 先关闭游标再关闭数据库链接
+    self.cursor.close()
+    self.connect.close()
+
 
 if __name__ == '__main__':
-    tm = TradeStorage()
-    print(tm.bought_set)
+    select_buy_times("128091")
+    kzz_position_list = select_position_list()
+    kzz_position_dict_list = dict()
+    print(kzz_position_list)
+    for x in kzz_position_list:
+        kzz_position_dict_list[x["symbol"]] = x
+
