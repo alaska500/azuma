@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 logs
+alogs
 *.pyc
 trade/__pycache__/
 trade/util/__pycache__/

@@ -161,7 +161,7 @@ def is_buy(symbol, name, latest_price, change, high, open, close, debug):
 
 
 def is_sell(buy_change, sell_change):
-    if sell_change < 10.80 or buy_change - sell_change > 0.75:
+    if sell_change < 2.85 or buy_change - sell_change > 0.55:
         return True
 
 
@@ -177,7 +177,7 @@ if __name__ == '__main__':
 
         if date_util.exist_trading_time(debug):
             try:
-                buy_kzz(ths_trader, kzz_top[:6].copy())
+                buy_kzz(ths_trader, kzz_top[:10].copy())
                 sell_kzz(ths_trader, kzz_top)
                 time.sleep(1)
             except Exception:
