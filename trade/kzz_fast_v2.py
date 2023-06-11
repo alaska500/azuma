@@ -3,7 +3,7 @@ import pandas as pd
 import ths_trader as ths
 import traceback
 import time
-import global_variable
+import config
 import message
 from util import date_util
 from util import log_util
@@ -23,7 +23,7 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.width', None)
 
 # 是否调试
-debug = global_variable.fast_trade_debug_mode
+debug = config.fast_trade_debug_mode
 
 today = datetime.now().strftime("%Y%m%d")
 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
             time.sleep(60)
             continue
 
-        if date_util.exist_trading_time(global_variable.trade_time_debug_mode):
+        if date_util.exist_trading_time(config.trade_time_debug_mode):
             try:
                 buy_kzz(kzz_top[:10].copy())
                 sell_kzz()
