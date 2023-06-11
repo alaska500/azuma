@@ -18,6 +18,7 @@ create_tabel_sql = f'''create table if not exists {tabel_name}
     date        varchar(20)   not null,
     symbol      varchar(20)   not null,
     name        varchar(20)   not null,
+    yesterday_close        decimal(8, 4)   not null,
     status      TINYINT       default '1',
     income      decimal(8, 4) default NULL,
     buy_time    datetime      not null,
@@ -47,9 +48,9 @@ cursor.execute(create_tabel_sql)
 connect.commit()
 
 
-def insert_buy_info(symbol, name, buy_time, buy_price, buy_change):
-    cursor.execute(f"insert into {tabel_name} (date,symbol,name,buy_price,buy_change,buy_time) values(?,?,?,?,?,?)",
-                   (today, symbol, name, buy_price, buy_change, buy_time))
+def insert_buy_info(symbol, name, buy_price, buy_change, buy_time, yesterday_close):
+    cursor.execute(f"insert into {tabel_name} (date,symbol,name,yesterday_close,buy_price,buy_change,buy_time) values(?,?,?,?,?,?,?)",
+                   (today, symbol, name, yesterday_close, buy_price, buy_change, buy_time))
     connect.commit()
 
 

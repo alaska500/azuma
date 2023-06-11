@@ -52,8 +52,6 @@ def backup_v3(date, symbol, quote, kzz_tick, strategy):
     buy_flag = False
     for row in kzz_tick.itertuples():
         time = getattr(row, '时间')
-        if time < '09:30:00':
-            continue
 
         price = getattr(row, '成交价')
         change = round((price / yesterday_close) - 1, 6)
@@ -61,26 +59,22 @@ def backup_v3(date, symbol, quote, kzz_tick, strategy):
         high_temp = price if price > high_temp else high_temp
         high_change_temp = round((high_temp / yesterday_close) - 1, 6)
 
-        if not buy_flag and (change > strategy.buy_change):
+        if time < '09:30:20':
+            continue
+
+        if not buy_flag and (change > strategy.buy_change) and (change >= high_change_temp):
             position.set_buy_info(price, change, time)
             buy_flag = True
             continue
-        if buy_flag and (change > position.buy_change + 0.3):
+        if buy_flag and (change < high_change_temp - 0.005):
             position.set_sell_info(price, change, time)
             break
         if buy_flag and (change < strategy.stop_loss):
             position.set_sell_info(price, change, time)
             break
-        if buy_flag and (change < high_change_temp - 0.004):
-            position.set_sell_info(price, change, time)
-            break
-
-        # if buy_flag and (change < strategy.stop_loss):
-        #     position.set_sell_info(price, change, time)
-        #     break
 
     if buy_flag and position.sell_price is None:
-        position.set_sell_info(high_temp, round((high_temp / yesterday_close) - 1, 6), "00:00:00")
+        position.set_sell_info(position.buy_price, position.buy_change, "00:00:00")
 
     if buy_flag and position.buy_price:
         position.income = round((position.sell_change - position.buy_change) * 100, 6)
@@ -227,10 +221,10 @@ if __name__ == '__main__':
     strategy_list.append(bm.TradeStrategy(0.055, 0.085, 0.051))
     strategy_list.append(bm.TradeStrategy(0.055, 0.090, 0.051))
 
-    list_b = [bm.TradeStrategy(0.020, 0.030, 0.016), bm.TradeStrategy(0.025, 0.035, 0.021),
-              bm.TradeStrategy(0.030, 0.040, 0.026), bm.TradeStrategy(0.035, 0.045, 0.031),
-              bm.TradeStrategy(0.040, 0.050, 0.036), bm.TradeStrategy(0.045, 0.055, 0.041),
-              bm.TradeStrategy(0.050, 0.060, 0.046), bm.TradeStrategy(0.055, 0.065, 0.051)]
+    list_b = [bm.TradeStrategy(0.020, 0.030, 0.015), bm.TradeStrategy(0.025, 0.035, 0.020),
+              bm.TradeStrategy(0.030, 0.040, 0.025), bm.TradeStrategy(0.035, 0.045, 0.030),
+              bm.TradeStrategy(0.040, 0.050, 0.035), bm.TradeStrategy(0.045, 0.055, 0.040),
+              bm.TradeStrategy(0.050, 0.060, 0.045), bm.TradeStrategy(0.055, 0.065, 0.050)]
 
 
     hanle_strategy_v3(trade_date_list, kzz_symbol_list, list_b)

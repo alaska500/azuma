@@ -92,7 +92,7 @@ class ThsTrader:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_variable.fast_trade_debug_mode:
+        if global_variable.ths_trader_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -118,7 +118,7 @@ class ThsTrader:
         # 确定买入
         market_buy_yes.click_input()
         # 点击是
-        if global_variable.fast_trade_debug_mode:
+        if global_variable.ths_trader_debug_mode:
             self.no_win_v2()
         else:
             self.yes_win_v2()
@@ -325,7 +325,7 @@ class ThsTrader:
         # 确定买入
         market_buy_yes.click_input()
         # 点击确定
-        if global_variable.fast_trade_debug_mode:
+        if global_variable.ths_trader_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()
@@ -367,7 +367,7 @@ class ThsTrader:
         # 点击卖出
         market_buy_yes.click_input()
         # 确定
-        if global_variable.fast_trade_debug_mode:
+        if global_variable.ths_trader_debug_mode:
             no_win_no = self.main_window.child_window(title="否(N)", auto_id="7", control_type="Button")
             if no_win_no.exists():
                 no_win_no.click_input()
