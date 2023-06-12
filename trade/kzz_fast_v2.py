@@ -7,10 +7,10 @@ import config
 import message
 from util import date_util
 from util import log_util
+from util import MyTT
 from datetime import datetime
 import os
 import storage
-import strategy
 
 os.environ['NO_PROXY'] = '*'
 
@@ -73,7 +73,7 @@ def confirm_buy(symbol):
     latest_price = df.loc[0, '收盘']
     change = df.loc[0, '涨跌幅']
     high = df.loc[0, '最高']
-    confirm = strategy.is_buy(symbol, name, latest_price, change, high, 1, 1, debug)
+    confirm = is_buy(symbol, name, latest_price, change, high, 1, 1, debug)
     logger.info(f"【😊】当前kzz {name} 涨跌幅[{change}] 确认是否继续买入：{confirm}")
     return confirm
 
@@ -83,7 +83,7 @@ def confirm_sell(symbol, buy_change, high_change):
     df = ef.bond.get_quote_history(str(symbol), beg=today)[-1:]
     name = df.loc[0, '债券名称']
     change = df.loc[0, '涨跌幅']
-    confirm = strategy.is_sell(buy_change, change, high_change, debug)
+    confirm = is_sell(buy_change, change, high_change, debug)
     logger.info(f"【😂】当前kzz {name} 涨跌幅[{change}] 确认是否继续卖出：{confirm}")
     return confirm
 
@@ -105,7 +105,7 @@ def buy_kzz(kzz_realtime_top):
         latest_price = float(getattr(row, '最新价'))
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if strategy.is_buy(symbol, name, latest_price, change, high, open_price, yesterday_close, debug):
+        if is_buy(symbol, name, latest_price, change, high, open_price, yesterday_close, debug):
             logger.info("【start】============================================================================")
             logger.info("【😊】开始买入，当前kzz实时行情信息:\n【😊】" + row.__str__())
             if not confirm_buy(symbol):
@@ -146,7 +146,7 @@ def sell_kzz():
         high_change = calculate_change(high, yesterday_close)
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if strategy.is_sell(buy_change, change, high_change, debug):
+        if is_sell(buy_change, change, high_change, debug):
             logger.info("【start】************************************************************************************")
             logger.info("【😂】开始卖出，当前kzz实时行情信息:\n【😂】" + row.__str__())
             if not confirm_sell(symbol, buy_change, high_change):
@@ -161,6 +161,25 @@ def sell_kzz():
 
             send_dingding_msg("sell", now, latest_price, change, name, symbol)
             logger.info("【end】************************************************************************************")
+
+
+def is_buy(symbol, name, latest_price, change, high, open, yesterday_close, debug):
+    if debug:
+        return (3.4 < change < 6) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
+    else:
+        return (open / yesterday_close < 1.08) and (3.4 < change < 6) and (high / latest_price < 1.001) \
+               and (not name.startswith("N")) \
+               and (not storage.is_bought(symbol)) \
+               and (storage.select_buy_times(symbol) < 2)
+
+
+def is_sell(buy_change, sell_change, high_change, debug):
+    if debug:
+        return True
+    if sell_change < 3 \
+            or (buy_change - sell_change > 0.40) \
+            or (high_change - sell_change > 0.50):
+        return True
 
 
 if __name__ == '__main__':

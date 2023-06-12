@@ -1,7 +1,7 @@
 from loguru import logger
 from datetime import datetime
 import pandas as pd
-import MyTT
+from util import MyTT
 
 # logger
 logger.add('../../logs/data_{time}.log', rotation='00:00', encoding='utf-8')
