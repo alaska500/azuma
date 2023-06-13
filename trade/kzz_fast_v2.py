@@ -41,7 +41,7 @@ def get_kzz_realtime_top():
         # 取出前50
         kzz_top_50 = kzz_sort[:50].copy()
         # 重新设置下标
-        kzz_top.index = range(len(kzz_top_50))
+        kzz_top_50.index = range(len(kzz_top_50))
         return kzz_top_50
     except:
         logger.error(traceback.format_exc())
@@ -167,7 +167,7 @@ def is_buy(symbol, name, latest_price, change, high, open, yesterday_close, debu
     if debug:
         return (3.4 < change < 6) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
     else:
-        return (open / yesterday_close < 1.08) and (3.4 < change < 6) and (high / latest_price < 1.001) \
+        return (open / yesterday_close < 1.08) and (3.4 < change < 6) and (high == latest_price) \
                and (not name.startswith("N")) \
                and (not storage.is_bought(symbol)) \
                and (storage.select_buy_times(symbol) < 2)
