@@ -67,7 +67,7 @@ def send_dingding_msg(trade_type, now, latest_price, change, name, symbol):
 #   债券名称 债券代码    日期        开盘     收盘   最高     最低     成交量      成交额       振幅  涨跌幅  涨跌额  换手率
 # 0  新天转债 128091  2023-06-08  194.456  203.0  212.5  194.003  516281  1.057723e+09   9.5   4.24  8.253  338.5
 def confirm_buy(symbol):
-    time.sleep(5)
+    time.sleep(3)
     df = ef.bond.get_quote_history(str(symbol), beg=today)[-1:]
     name = df.loc[0, '债券名称']
     latest_price = df.loc[0, '收盘']
@@ -78,12 +78,12 @@ def confirm_buy(symbol):
     return confirm
 
 
-def confirm_sell(symbol, buy_change, high_change):
+def confirm_sell(symbol, buy_change, high_change, buy_time, sell_time):
     time.sleep(1)
     df = ef.bond.get_quote_history(str(symbol), beg=today)[-1:]
     name = df.loc[0, '债券名称']
     change = df.loc[0, '涨跌幅']
-    confirm = is_sell(buy_change, change, high_change, debug)
+    confirm = is_sell(buy_change, change, high_change, buy_time, sell_time, debug)
     logger.info(f"【😂】当前kzz {name} 涨跌幅[{change}] 确认是否继续卖出：{confirm}")
     return confirm
 
@@ -142,43 +142,51 @@ def sell_kzz():
         change = getattr(row, '涨跌幅')
         high = getattr(row, '最高')
         buy_change = kzz_position_dict_list[symbol]["buy_change"]
+        buy_time = datetime.strptime(kzz_position_dict_list[symbol]["buy_time"], "%Y-%m-%d %H:%M:%S")
         yesterday_close = kzz_position_dict_list[symbol]["yesterday_close"]
         high_change = calculate_change(high, yesterday_close)
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        now_format_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
-        if is_sell(buy_change, change, high_change, debug):
+        if is_sell(buy_change, change, high_change, buy_time, now, debug):
             logger.info("【start】************************************************************************************")
             logger.info("【😂】开始卖出，当前kzz实时行情信息:\n【😂】" + row.__str__())
-            if not confirm_sell(symbol, buy_change, high_change):
+            if not confirm_sell(symbol, buy_change, high_change, buy_time, now, debug):
                 continue
 
             ths_trader.sell_fast(symbol)
             logger.info("【😂】交易完成！")
 
-            storage.insert_sell_info(symbol, 0, latest_price, change, now)
+            storage.insert_sell_info(symbol, 0, latest_price, change, now_format_str)
             logger.info('【😂】通知：在[%s]时委托下单，以市价[%s][%s]涨幅卖出[%s][%s]股票' % (
-                now, latest_price, change, name, symbol))
+                now_format_str, latest_price, change, name, symbol))
 
-            send_dingding_msg("sell", now, latest_price, change, name, symbol)
+            send_dingding_msg("sell", now_format_str, latest_price, change, name, symbol)
             logger.info("【end】************************************************************************************")
 
 
 def is_buy(symbol, name, latest_price, change, high, open, yesterday_close, debug):
     if debug:
-        return (3.4 < change < 6) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
+        return (3.4 < change < 8) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
     else:
-        return (open / yesterday_close < 1.08) and (3.4 < change < 6) and (high == latest_price) \
+        return (open / yesterday_close < 1.08) and (3.4 < change < 8) and (high / latest_price < 1.009) \
                and (not name.startswith("N")) \
                and (not storage.is_bought(symbol)) \
                and (storage.select_buy_times(symbol) < 2)
 
 
-def is_sell(buy_change, sell_change, high_change, debug):
+def is_sell(buy_change, sell_change, high_change, buy_time, sell_time, debug):
     if debug:
         return True
+    if buy_change - sell_change > 1.5:
+        return True
+
+    if (sell_time - buy_time).seconds < 300:
+        return False
+
     if sell_change < 3 \
             or (buy_change - sell_change > 0.40) \
-            or (high_change - sell_change > 0.50):
+            or (high_change - sell_change > 0.40):
         return True
 
 

@@ -8,16 +8,16 @@ from datetime import datetime
 import traceback
 import back_model as bm
 
-today = datetime.now().strftime("%Y-%m-%d")
-logger.add("..\\..\\alogs\\info.log", filter=lambda record: record["level"].name == "INFO")
-logger.add("..\\..\\alogs\\error.log", filter=lambda record: record["level"].name == "ERROR")
-logger.add("..\\..\\alogs\\warning.log", filter=lambda record: record["level"].name == "WARNING")
-logger.add("..\\..\\alogs\\debug.log", filter=lambda record: record["message"].__contains__("debug"))
 
+df = pd.read_csv("E:/script/2023-06-13_copy.csv", header=None)
+df.columns = ["时间", '债券代码', '债券名称', '涨跌幅', '最新价', '最高', '最低', '今开', '成交量', '成交额', '昨日收盘']
 
-os.environ['NO_PROXY'] = '*'
-
-
-logger.warning("WARNINGdebug")
-logger.info("INFOPdebug")
-logger.error("ERRORdebug")
+start = 0
+step = 50
+while True:
+    end = start + step
+    dff = df[start:end].copy()
+    start = end
+    print("=====================================")
+    print(dff.to_string())
+    print("=====================================")

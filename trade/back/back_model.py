@@ -38,3 +38,16 @@ class TradePosition:
         self.buy_price = buy_price
         self.buy_change = buy_change
         self.buy_time = buy_time
+
+
+class TradeStrategyV2:
+    def __init__(self, buy__change_floor, buy_change_upper, stop_profit, stop_loss, stop_loss_lowest, wait_time, table_name, back_storage):
+        self.buy__change_floor = buy__change_floor
+        self.buy_change_upper = buy_change_upper
+        self.wait_time = wait_time
+        self.stop_profit = stop_profit
+        self.stop_loss = stop_loss
+        self.stop_loss_lowest = stop_loss_lowest
+        self.table_name = table_name
+        self.back_storage = back_storage
+        self.strategy_name = f"strategy_{str(buy__change_floor)}_{str(stop_profit)}"
