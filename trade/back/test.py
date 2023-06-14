@@ -9,8 +9,11 @@ import traceback
 import back_model as bm
 
 
-df = pd.read_csv("E:/script/2023-06-13_copy.csv", header=None)
+df = pd.read_csv("E:/script/2023-06-14.csv", header=None)
 df.columns = ["时间", '债券代码', '债券名称', '涨跌幅', '最新价', '最高', '最低', '今开', '成交量', '成交额', '昨日收盘']
+
+dff = df[df.债券代码 == 127061]
+print(dff.to_string())
 
 start = 0
 step = 50

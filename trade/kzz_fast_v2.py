@@ -7,7 +7,6 @@ import config
 import message
 from util import date_util
 from util import log_util
-from util import MyTT
 from datetime import datetime
 import os
 import storage
@@ -64,30 +63,6 @@ def send_dingding_msg(trade_type, now, latest_price, change, name, symbol):
     message.send(msg)
 
 
-#   债券名称 债券代码    日期        开盘     收盘   最高     最低     成交量      成交额       振幅  涨跌幅  涨跌额  换手率
-# 0  新天转债 128091  2023-06-08  194.456  203.0  212.5  194.003  516281  1.057723e+09   9.5   4.24  8.253  338.5
-def confirm_buy(symbol):
-    time.sleep(3)
-    df = ef.bond.get_quote_history(str(symbol), beg=today)[-1:]
-    name = df.loc[0, '债券名称']
-    latest_price = df.loc[0, '收盘']
-    change = df.loc[0, '涨跌幅']
-    high = df.loc[0, '最高']
-    confirm = is_buy(symbol, name, latest_price, change, high, 1, 1, debug)
-    logger.info(f"【😊】当前kzz {name} 涨跌幅[{change}] 确认是否继续买入：{confirm}")
-    return confirm
-
-
-def confirm_sell(symbol, buy_change, high_change, buy_time, sell_time):
-    time.sleep(1)
-    df = ef.bond.get_quote_history(str(symbol), beg=today)[-1:]
-    name = df.loc[0, '债券名称']
-    change = df.loc[0, '涨跌幅']
-    confirm = is_sell(buy_change, change, high_change, buy_time, sell_time, debug)
-    logger.info(f"【😂】当前kzz {name} 涨跌幅[{change}] 确认是否继续卖出：{confirm}")
-    return confirm
-
-
 #    债券代码 债券名称  涨跌幅   最新价    最高    最低    今开     涨跌额    换手率  量比 动态市盈率 成交量     成交额      昨日收盘    总市值     流通市值      行情ID   市场类型      更新时间         最新交易日
 # 0  113669  N景23转  20.25  120.245  123.8  120.01  122.71  20.245  27.14    -     -    313216  380234522.0  100.000      -      1387627300  1.113669   沪A  2023-05-09 16:11:31  2023-05-09
 # 1  123193  海能转债  16.32  116.324  118.5  115.46  118.0   16.324  60.69    -     -    364142  423652515.31 100.000  697944000  697944000   0.123193   深A  2023-05-09 15:34:18  2023-05-09
@@ -105,11 +80,9 @@ def buy_kzz(kzz_realtime_top):
         latest_price = float(getattr(row, '最新价'))
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if is_buy(symbol, name, latest_price, change, high, open_price, yesterday_close, debug):
+        if is_buy(symbol, name, latest_price, change, high, open_price, yesterday_close):
             logger.info("【start】============================================================================")
             logger.info("【😊】开始买入，当前kzz实时行情信息:\n【😊】" + row.__str__())
-            if not confirm_buy(symbol):
-                break
 
             ths_trader.buy_fast(symbol)
             logger.info("【😊】交易完成！")
@@ -148,11 +121,9 @@ def sell_kzz():
         now = datetime.now()
         now_format_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
-        if is_sell(buy_change, change, high_change, buy_time, now, debug):
+        if is_sell(buy_change, change, high_change, buy_time, now):
             logger.info("【start】************************************************************************************")
             logger.info("【😂】开始卖出，当前kzz实时行情信息:\n【😂】" + row.__str__())
-            if not confirm_sell(symbol, buy_change, high_change, buy_time, now, debug):
-                continue
 
             ths_trader.sell_fast(symbol)
             logger.info("【😂】交易完成！")
@@ -165,23 +136,23 @@ def sell_kzz():
             logger.info("【end】************************************************************************************")
 
 
-def is_buy(symbol, name, latest_price, change, high, open, yesterday_close, debug):
+def is_buy(symbol, name, latest_price, change, high, open_price, yesterday_close):
     if debug:
-        return (3.4 < change < 8) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
+        return (3 < change < 8) and (not name.startswith("N")) and (not storage.is_bought(symbol)) and (storage.select_buy_times(symbol) < 2)
     else:
-        return (open / yesterday_close < 1.08) and (3.4 < change < 8) and (high / latest_price < 1.009) \
+        return (open_price / yesterday_close < 1.08) and (3 < change < 8) and (high / latest_price < 1.009) \
                and (not name.startswith("N")) \
                and (not storage.is_bought(symbol)) \
                and (storage.select_buy_times(symbol) < 2)
 
 
-def is_sell(buy_change, sell_change, high_change, buy_time, sell_time, debug):
+def is_sell(buy_change, sell_change, high_change, buy_time, sell_time):
     if debug:
         return True
-    if buy_change - sell_change > 1.5:
+    if buy_change - sell_change > 3 or sell_change < 2:
         return True
 
-    if (sell_time - buy_time).seconds < 300:
+    if (sell_time - buy_time).seconds < 350:
         return False
 
     if sell_change < 3 \
