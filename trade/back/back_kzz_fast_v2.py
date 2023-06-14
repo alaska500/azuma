@@ -21,10 +21,10 @@ def calculate_change(price, yesterday_close):
 
 
 def is_buy(symbol, name, latest_price, change, high, strategy):
-    return (strategy.buy__change_floor < change < strategy.buy_change_upper) and (high / latest_price < 1.009) \
+    return (strategy.buy__change_floor < change < strategy.buy_change_upper) and (high / latest_price < 1.007) \
            and (not name.startswith("N")) \
            and (not strategy.back_storage.is_bought(symbol)) \
-           and (strategy.back_storage.select_buy_times(symbol) < 3)
+           and (strategy.back_storage.select_buy_times(symbol) < 2)
 
 
 def back_buy(top_10, strategy):
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         back_test_date = datetime.strptime(back_date_str, "%Y%m%d")
         yesterday = (back_test_date + timedelta(days=-1)).strftime("%Y%m%d")
         # buy__change_floor, buy_change_upper, stop_profit, stop_loss, stop_loss_lowest, wait_time
-        strategy_list.append(back_model.TradeStrategyV2(3, 10, 0.4, 0.4, 2.5, 350, back_date_str, yesterday))
+        strategy_list.append(back_model.TradeStrategyV2(3, 8, 0.4, 0.4, 2.5, 350, back_date_str, yesterday))
 
 
         #strategy_list.append(back_model.TradeStrategyV2(3.5, 8, 0.4, 0.5, 2.5, 300, back_date_str, yesterday))
