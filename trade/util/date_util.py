@@ -13,7 +13,7 @@ def exist_trading_time(debug):
 
     now = datetime.now()
 
-    morning_trading_start_time = datetime(now.year, now.month, now.day, 9, 30, 20)
+    morning_trading_start_time = datetime(now.year, now.month, now.day, 9, 30, 4)
     morning_trading_end_time = datetime(now.year, now.month, now.day, 11, 30, 00)
 
     afternoon_trading_start_time = datetime(now.year, now.month, now.day, 13, 00, 30)

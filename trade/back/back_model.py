@@ -42,13 +42,13 @@ class TradePosition:
 
 
 def generate_table_name(buy__change_floor, buy_change_upper, stop_profit, stop_loss,
-                        stop_loss_lowest, wait_time, back_date):
-    return f"strategy_{back_date}_{buy__change_floor}-{buy_change_upper}_{stop_profit}-{stop_loss}_{stop_loss_lowest}_{wait_time}"
+                        stop_loss_lowest, wait_time, back_date, top_n):
+    return f"strategy_{back_date}_{buy__change_floor}-{buy_change_upper}_{stop_profit}-{stop_loss}_{stop_loss_lowest}_{wait_time}_top{top_n}"
 
 
 class TradeStrategyV2:
     def __init__(self, buy__change_floor, buy_change_upper, stop_profit, stop_loss, stop_loss_lowest, wait_time,
-                 back_date, back_yesterday):
+                 back_date, back_yesterday, top_n):
         self.back_date = back_date
         self.back_yesterday = back_yesterday
         self.buy__change_floor = buy__change_floor
@@ -58,6 +58,7 @@ class TradeStrategyV2:
         self.stop_loss = stop_loss
         self.stop_loss_lowest = stop_loss_lowest
         self.table_name = generate_table_name(buy__change_floor, buy_change_upper, stop_profit, stop_loss,
-                                              stop_loss_lowest, wait_time, back_date)
+                                              stop_loss_lowest, wait_time, back_date, top_n)
         self.back_storage = BackStorage(self.table_name)
+        self.top_n = top_n
         self.income = 0

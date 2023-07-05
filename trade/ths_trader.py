@@ -1,6 +1,7 @@
 # coding=utf-8
 # 导入库
 import io
+import os
 import time
 import pandas as pd
 import pytesseract
@@ -15,6 +16,8 @@ from datetime import datetime
 logger = log_util.get_logger()
 # 下单程序的路径
 xiadan_exe_path = r'D:\同花顺软件\同花顺\xiadan.exe'
+if os.getlogin().__eq__("ly"):
+    xiadan_exe_path = r"D:\同花顺远航版\transaction\xiadan.exe"
 tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
